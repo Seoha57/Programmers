@@ -43,3 +43,24 @@ int solution(vector<int> numbers, int target) {
     
     return answer;
 }
+
+/**************************************************/
+#include <string>
+#include <vector>
+
+using namespace std;
+
+int dfs(const vector<int>& numbers, int target, int calculated, int index) {
+    if(index == numbers.size()) {
+        if(target == calculated)
+            return 1;
+        return 0;
+    }
+    
+    return dfs(numbers, target, calculated + numbers[index], index + 1) + 
+        dfs(numbers, target, calculated - numbers[index], index + 1);
+}
+
+int solution(vector<int> numbers, int target) {
+    return dfs(numbers, target, 0, 0);
+}
