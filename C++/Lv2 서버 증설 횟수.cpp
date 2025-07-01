@@ -1,0 +1,80 @@
+/*
+문제 설명
+당신은 온라인 게임을 운영하고 있습니다. 같은 시간대에 게임을 이용하는 사람이 m명 늘어날 때마다 서버 1대가 추가로 필요합니다. 어느 시간대의 이용자가 m명 미만이라면, 서버 증설이 필요하지 않습니다. 어느 시간대의 이용자가 n x m명 이상 (n + 1) x m명 미만이라면 최소 n대의 증설된 서버가 운영 중이어야 합니다. 한 번 증설한 서버는 k시간 동안 운영하고 그 이후에는 반납합니다. 예를 들어, k = 5 일 때 10시에 증설한 서버는 10 ~ 15시에만 운영됩니다.
+
+하루 동안 모든 게임 이용자가 게임을 하기 위해 서버를 최소 몇 번 증설해야 하는지 알고 싶습니다. 같은 시간대에 서버를 x대 증설했다면 해당 시간대의 증설 횟수는 x회입니다.
+
+다음은 m = 3, k = 5 일 때의 시간대별 증설된 서버의 수와 증설 횟수 예시입니다.
+
+시각	게임 이용자의 수	증설된 서버의 수	증설 횟수
+0 ~ 1	0	0	0
+1 ~ 2	2	0	0
+2 ~ 3	3	1	1
+3 ~ 4	3	1	0
+4 ~ 5	1	1	0
+5 ~ 6	2	1	0
+6 ~ 7	0	1	0
+7 ~ 8	0	0	0
+8 ~ 9	0	0	0
+9 ~ 10	0	0	0
+10 ~ 11	4	1	1
+11 ~ 12	2	1	0
+12 ~ 13	0	1	0
+13 ~ 14	6	2	1
+14 ~ 15	0	2	0
+15 ~ 16	4	1	0
+16 ~ 17	2	1	0
+17 ~ 18	13	4	3
+18 ~ 19	3	3	0
+19 ~ 20	5	3	0
+20 ~ 21	10	3	0
+21 ~ 22	0	3	0
+22 ~ 23	1	0	0
+23 ~ 24	5	1	1
+모든 게임 이용자를 감당하기 위해 최소 7번 서버를 증설해야 하며, 이보다 적은 수의 서버 증설로는 모든 게임 이용자를 감당할 수 없습니다.
+
+0시에서 23시까지의 시간대별 게임 이용자의 수를 나타내는 1차원 정수 배열 players, 서버 한 대로 감당할 수 있는 최대 이용자의 수를 나타내는 정수 m, 서버 한 대가 운영 가능한 시간을 나타내는 정수 k가 주어집니다. 이때, 모든 게임 이용자를 감당하기 위한 최소 서버 증설 횟수를 return 하도록 solution을 완성해 주세요.
+
+제한사항
+players의 길이 = 24
+0 ≤ players의 원소 ≤ 1,000
+players[i]는 i시 ~ i+1시 사이의 게임 이용자의 수를 나타냅니다.
+1 ≤ m ≤ 1,000
+1 ≤ k ≤ 24
+*/
+#include <string>
+#include <vector>
+#include <queue>
+#include <iostream>
+
+using namespace std;
+
+int solution(vector<int> players, int m, int k) {
+    int answer = 0;
+    queue<pair<int, int>> servers;
+    for (int i = 0; i < players.size(); ++i) {
+        //서버 사용 시간 확인
+        if(!servers.empty()) {
+            int size = servers.size();
+            for (int s = 0; s < size; ++s) {
+                pair<int, int> server = servers.front();                
+                servers.pop();
+                server.second -= 1;
+                //서버 사용 시간 남았으면 다시 리스트업
+                if(server.second > 0)
+                    servers.push(server);
+            }
+        }
+        int num_server = servers.size();
+        //늘어난 서버 만큼의 이용자 수 확인
+        if(players[i] >= (m + (m*num_server))) {
+            //이용자 감당할 만큼 서버 증설
+            while(players[i] >= (m + (m*num_server))) {
+                servers.push({++answer, k});
+                num_server = servers.size();
+            }
+        }
+    }
+    
+    return answer;
+}
